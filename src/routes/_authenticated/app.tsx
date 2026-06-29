@@ -45,8 +45,8 @@ function WorkspaceHome() {
         .select()
         .single();
       if (error) throw error;
-      // Seed a trialing subscription on the Free plan
-      const { data: plan } = await supabase.from("plans").select("id").eq("tier", "free").single();
+      await supabase.from("memberships").insert({ org_id: data.id, user_id: user!.id, role: "owner" });
+      const { data: plan } = await supabase.from("plans").select("id").eq("tier", "free").maybeSingle();
       if (plan) {
         await supabase.from("subscriptions").insert({ org_id: data.id, plan_id: plan.id, status: "trialing" });
       }
