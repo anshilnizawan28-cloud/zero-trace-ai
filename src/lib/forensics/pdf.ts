@@ -17,7 +17,9 @@ function fmtPdfDate(d?: string): string | undefined {
 }
 
 export async function parsePdf(bytes: ArrayBuffer, onProgress?: (n: number, total: number, label: string) => void) {
-  const loadingTask = pdfjs.getDocument({ data: new Uint8Array(bytes) });
+  // pdf.js transfers ownership of the buffer to its worker (detaches it).
+  // Pass a copy so we can still securely wipe the original.
+  const loadingTask = pdfjs.getDocument({ data: new Uint8Array(bytes).slice() });
   const doc = await loadingTask.promise;
 
   const meta = await doc.getMetadata().catch(() => ({ info: {}, metadata: null } as any));

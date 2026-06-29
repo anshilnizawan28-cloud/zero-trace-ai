@@ -73,8 +73,12 @@ export async function analyzeFile(
   const excerpt = text.slice(0, 15_000);
 
   onProgress({ phase: "wipe", pct: 95 });
-  // Securely wipe the in-memory buffer
-  new Uint8Array(buf).fill(0);
+  // Securely wipe the in-memory buffer (may already be detached if parser transferred it)
+  try {
+    if (buf.byteLength > 0) new Uint8Array(buf).fill(0);
+  } catch {
+    /* buffer already detached / transferred by parser worker */
+  }
 
   onProgress({ phase: "wipe", pct: 100 });
 
