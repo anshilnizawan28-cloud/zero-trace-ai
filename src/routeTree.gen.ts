@@ -9,22 +9,101 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as ZeroStorageRouteImport } from './routes/zero-storage'
+import { Route as UseCasesRouteImport } from './routes/use-cases'
+import { Route as SupportedFilesRouteImport } from './routes/supported-files'
+import { Route as SecurityRouteImport } from './routes/security'
+import { Route as SampleReportRouteImport } from './routes/sample-report'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as PricingRouteImport } from './routes/pricing'
+import { Route as FeaturesRouteImport } from './routes/features'
+import { Route as FaqRouteImport } from './routes/faq'
+import { Route as EnterpriseRouteImport } from './routes/enterprise'
+import { Route as DocsRouteImport } from './routes/docs'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as BlogRouteImport } from './routes/blog'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as ApiReferenceRouteImport } from './routes/api-reference'
 import { Route as AnalyzeRouteImport } from './routes/analyze'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthResetPasswordRouteImport } from './routes/auth.reset-password'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
 
-const DashboardRoute = DashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
+const ZeroStorageRoute = ZeroStorageRouteImport.update({
+  id: '/zero-storage',
+  path: '/zero-storage',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UseCasesRoute = UseCasesRouteImport.update({
+  id: '/use-cases',
+  path: '/use-cases',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SupportedFilesRoute = SupportedFilesRouteImport.update({
+  id: '/supported-files',
+  path: '/supported-files',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SecurityRoute = SecurityRouteImport.update({
+  id: '/security',
+  path: '/security',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SampleReportRoute = SampleReportRouteImport.update({
+  id: '/sample-report',
+  path: '/sample-report',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PricingRoute = PricingRouteImport.update({
+  id: '/pricing',
+  path: '/pricing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FeaturesRoute = FeaturesRouteImport.update({
+  id: '/features',
+  path: '/features',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EnterpriseRoute = EnterpriseRouteImport.update({
+  id: '/enterprise',
+  path: '/enterprise',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DocsRoute = DocsRouteImport.update({
+  id: '/docs',
+  path: '/docs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogRoute = BlogRouteImport.update({
+  id: '/blog',
+  path: '/blog',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiReferenceRoute = ApiReferenceRouteImport.update({
+  id: '/api-reference',
+  path: '/api-reference',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AnalyzeRoute = AnalyzeRouteImport.update({
@@ -46,6 +125,11 @@ const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => AuthRoute,
 } as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAppRoute = AuthenticatedAppRouteImport.update({
   id: '/app',
   path: '/app',
@@ -55,17 +139,45 @@ const AuthenticatedAppRoute = AuthenticatedAppRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/analyze': typeof AnalyzeRoute
+  '/api-reference': typeof ApiReferenceRoute
   '/auth': typeof AuthRouteWithChildren
-  '/dashboard': typeof DashboardRoute
+  '/blog': typeof BlogRoute
+  '/contact': typeof ContactRoute
+  '/docs': typeof DocsRoute
+  '/enterprise': typeof EnterpriseRoute
+  '/faq': typeof FaqRoute
+  '/features': typeof FeaturesRoute
+  '/pricing': typeof PricingRoute
+  '/privacy': typeof PrivacyRoute
+  '/sample-report': typeof SampleReportRoute
+  '/security': typeof SecurityRoute
+  '/supported-files': typeof SupportedFilesRoute
+  '/use-cases': typeof UseCasesRoute
+  '/zero-storage': typeof ZeroStorageRoute
   '/app': typeof AuthenticatedAppRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/analyze': typeof AnalyzeRoute
+  '/api-reference': typeof ApiReferenceRoute
   '/auth': typeof AuthRouteWithChildren
-  '/dashboard': typeof DashboardRoute
+  '/blog': typeof BlogRoute
+  '/contact': typeof ContactRoute
+  '/docs': typeof DocsRoute
+  '/enterprise': typeof EnterpriseRoute
+  '/faq': typeof FaqRoute
+  '/features': typeof FeaturesRoute
+  '/pricing': typeof PricingRoute
+  '/privacy': typeof PrivacyRoute
+  '/sample-report': typeof SampleReportRoute
+  '/security': typeof SecurityRoute
+  '/supported-files': typeof SupportedFilesRoute
+  '/use-cases': typeof UseCasesRoute
+  '/zero-storage': typeof ZeroStorageRoute
   '/app': typeof AuthenticatedAppRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
 }
 export interface FileRoutesById {
@@ -73,9 +185,23 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/analyze': typeof AnalyzeRoute
+  '/api-reference': typeof ApiReferenceRoute
   '/auth': typeof AuthRouteWithChildren
-  '/dashboard': typeof DashboardRoute
+  '/blog': typeof BlogRoute
+  '/contact': typeof ContactRoute
+  '/docs': typeof DocsRoute
+  '/enterprise': typeof EnterpriseRoute
+  '/faq': typeof FaqRoute
+  '/features': typeof FeaturesRoute
+  '/pricing': typeof PricingRoute
+  '/privacy': typeof PrivacyRoute
+  '/sample-report': typeof SampleReportRoute
+  '/security': typeof SecurityRoute
+  '/supported-files': typeof SupportedFilesRoute
+  '/use-cases': typeof UseCasesRoute
+  '/zero-storage': typeof ZeroStorageRoute
   '/_authenticated/app': typeof AuthenticatedAppRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
 }
 export interface FileRouteTypes {
@@ -83,26 +209,68 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/analyze'
+    | '/api-reference'
     | '/auth'
-    | '/dashboard'
+    | '/blog'
+    | '/contact'
+    | '/docs'
+    | '/enterprise'
+    | '/faq'
+    | '/features'
+    | '/pricing'
+    | '/privacy'
+    | '/sample-report'
+    | '/security'
+    | '/supported-files'
+    | '/use-cases'
+    | '/zero-storage'
     | '/app'
+    | '/dashboard'
     | '/auth/reset-password'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/analyze'
+    | '/api-reference'
     | '/auth'
-    | '/dashboard'
+    | '/blog'
+    | '/contact'
+    | '/docs'
+    | '/enterprise'
+    | '/faq'
+    | '/features'
+    | '/pricing'
+    | '/privacy'
+    | '/sample-report'
+    | '/security'
+    | '/supported-files'
+    | '/use-cases'
+    | '/zero-storage'
     | '/app'
+    | '/dashboard'
     | '/auth/reset-password'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/analyze'
+    | '/api-reference'
     | '/auth'
-    | '/dashboard'
+    | '/blog'
+    | '/contact'
+    | '/docs'
+    | '/enterprise'
+    | '/faq'
+    | '/features'
+    | '/pricing'
+    | '/privacy'
+    | '/sample-report'
+    | '/security'
+    | '/supported-files'
+    | '/use-cases'
+    | '/zero-storage'
     | '/_authenticated/app'
+    | '/_authenticated/dashboard'
     | '/auth/reset-password'
   fileRoutesById: FileRoutesById
 }
@@ -110,17 +278,114 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AnalyzeRoute: typeof AnalyzeRoute
+  ApiReferenceRoute: typeof ApiReferenceRoute
   AuthRoute: typeof AuthRouteWithChildren
-  DashboardRoute: typeof DashboardRoute
+  BlogRoute: typeof BlogRoute
+  ContactRoute: typeof ContactRoute
+  DocsRoute: typeof DocsRoute
+  EnterpriseRoute: typeof EnterpriseRoute
+  FaqRoute: typeof FaqRoute
+  FeaturesRoute: typeof FeaturesRoute
+  PricingRoute: typeof PricingRoute
+  PrivacyRoute: typeof PrivacyRoute
+  SampleReportRoute: typeof SampleReportRoute
+  SecurityRoute: typeof SecurityRoute
+  SupportedFilesRoute: typeof SupportedFilesRoute
+  UseCasesRoute: typeof UseCasesRoute
+  ZeroStorageRoute: typeof ZeroStorageRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/dashboard': {
-      id: '/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardRouteImport
+    '/zero-storage': {
+      id: '/zero-storage'
+      path: '/zero-storage'
+      fullPath: '/zero-storage'
+      preLoaderRoute: typeof ZeroStorageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/use-cases': {
+      id: '/use-cases'
+      path: '/use-cases'
+      fullPath: '/use-cases'
+      preLoaderRoute: typeof UseCasesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/supported-files': {
+      id: '/supported-files'
+      path: '/supported-files'
+      fullPath: '/supported-files'
+      preLoaderRoute: typeof SupportedFilesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/security': {
+      id: '/security'
+      path: '/security'
+      fullPath: '/security'
+      preLoaderRoute: typeof SecurityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sample-report': {
+      id: '/sample-report'
+      path: '/sample-report'
+      fullPath: '/sample-report'
+      preLoaderRoute: typeof SampleReportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pricing': {
+      id: '/pricing'
+      path: '/pricing'
+      fullPath: '/pricing'
+      preLoaderRoute: typeof PricingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/features': {
+      id: '/features'
+      path: '/features'
+      fullPath: '/features'
+      preLoaderRoute: typeof FeaturesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/enterprise': {
+      id: '/enterprise'
+      path: '/enterprise'
+      fullPath: '/enterprise'
+      preLoaderRoute: typeof EnterpriseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/docs': {
+      id: '/docs'
+      path: '/docs'
+      fullPath: '/docs'
+      preLoaderRoute: typeof DocsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog': {
+      id: '/blog'
+      path: '/blog'
+      fullPath: '/blog'
+      preLoaderRoute: typeof BlogRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -128,6 +393,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api-reference': {
+      id: '/api-reference'
+      path: '/api-reference'
+      fullPath: '/api-reference'
+      preLoaderRoute: typeof ApiReferenceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/analyze': {
@@ -158,6 +430,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthResetPasswordRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/app': {
       id: '/_authenticated/app'
       path: '/app'
@@ -170,10 +449,12 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAppRoute: typeof AuthenticatedAppRoute
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAppRoute: AuthenticatedAppRoute,
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -193,8 +474,21 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AnalyzeRoute: AnalyzeRoute,
+  ApiReferenceRoute: ApiReferenceRoute,
   AuthRoute: AuthRouteWithChildren,
-  DashboardRoute: DashboardRoute,
+  BlogRoute: BlogRoute,
+  ContactRoute: ContactRoute,
+  DocsRoute: DocsRoute,
+  EnterpriseRoute: EnterpriseRoute,
+  FaqRoute: FaqRoute,
+  FeaturesRoute: FeaturesRoute,
+  PricingRoute: PricingRoute,
+  PrivacyRoute: PrivacyRoute,
+  SampleReportRoute: SampleReportRoute,
+  SecurityRoute: SecurityRoute,
+  SupportedFilesRoute: SupportedFilesRoute,
+  UseCasesRoute: UseCasesRoute,
+  ZeroStorageRoute: ZeroStorageRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

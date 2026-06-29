@@ -42,7 +42,7 @@ function AuthPage() {
   const [forgotMode, setForgotMode] = useState(false);
 
   useEffect(() => {
-    if (!loading && user) navigate({ to: search.redirect ?? "/app", replace: true });
+    if (!loading && user) navigate({ to: (search.redirect as "/dashboard") ?? "/dashboard", replace: true });
   }, [loading, user, navigate, search.redirect]);
 
   async function submit(e: React.FormEvent) {
