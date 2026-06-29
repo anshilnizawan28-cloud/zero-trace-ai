@@ -2,7 +2,6 @@ import type { DocMetadata, OcrResult } from "./types";
 
 // pdfjs worker setup (Vite-friendly)
 import * as pdfjs from "pdfjs-dist";
-// @ts-expect-error - vite worker url import
 import workerUrl from "pdfjs-dist/build/pdf.worker.mjs?url";
 (pdfjs as unknown as { GlobalWorkerOptions: { workerSrc: string } }).GlobalWorkerOptions.workerSrc = workerUrl;
 
@@ -88,7 +87,7 @@ export async function parsePdf(bytes: ArrayBuffer, onProgress?: (n: number, tota
   };
 
   await doc.cleanup();
-  await doc.destroy();
+  (doc as unknown as { destroy?: () => Promise<void> }).destroy?.();
 
   return { metadata, text: textBuf.trim(), ocr };
 }
