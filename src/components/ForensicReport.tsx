@@ -1,5 +1,6 @@
 import type { ExtractResult } from "@/lib/forensics/types";
 import type { ForensicReport } from "@/lib/forensic-ai.functions";
+import { TrustScoreCard, computeTrustScore } from "@/components/TrustScore";
 import {
   AlertTriangle, CheckCircle2, Clock, Download, FileText, Fingerprint, Gauge,
   History, Languages, Lock, ScanLine, ShieldAlert, ShieldCheck, Sparkles, Trash2,
@@ -69,6 +70,7 @@ export function ForensicReportView({
 
   const m = extract.metadata;
   const tone = report.riskLabel;
+  const trust = computeTrustScore(extract, report);
 
   return (
     <div className="space-y-6">
@@ -96,6 +98,9 @@ export function ForensicReportView({
           </div>
         </div>
       </div>
+
+      {/* Flagship Trust Score */}
+      <TrustScoreCard score={trust} />
 
       {/* Executive */}
       <section className="rounded-2xl border border-border/60 bg-card p-6 shadow-card">

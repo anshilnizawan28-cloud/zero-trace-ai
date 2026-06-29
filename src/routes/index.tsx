@@ -2,12 +2,13 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
 import heroImg from "@/assets/hero-shield.jpg";
 import { SiteNav } from "@/components/SiteNav";
+import { SiteFooter } from "@/components/SiteFooter";
 import { PrivacyBadge } from "@/components/PrivacyBadge";
 import { ProcessingPipeline } from "@/components/ProcessingPipeline";
 import {
   ShieldCheck, Brain, ScanText, GitCompare, Fingerprint, Lock,
   EyeOff, FileSearch, ArrowRight, Building2, Landmark, Scale,
-  HeartPulse, Server, FileWarning,
+  HeartPulse, Server, FileWarning, PlayCircle, Download,
 } from "lucide-react";
 
 export const Route = createFileRoute("/")({
@@ -75,22 +76,29 @@ function Index() {
             </p>
             <div className="flex flex-wrap gap-3">
               <Link
-                to="/analyze"
+                to={"/auth" as any}
+                search={{ mode: "signup" } as any}
                 className="inline-flex items-center gap-2 rounded-lg bg-gradient-cyber px-5 py-3 text-sm font-semibold text-primary-foreground shadow-glow transition-transform hover:-translate-y-0.5"
               >
-                Analyze a document <ArrowRight className="h-4 w-4" />
+                Start Free Trial <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
-                to="/analyze"
+                to={"/analyze" as any}
                 className="inline-flex items-center gap-2 rounded-lg border border-border bg-card/40 px-5 py-3 text-sm font-semibold text-foreground hover:bg-accent/30"
               >
-                <GitCompare className="h-4 w-4" /> Compare documents
+                <PlayCircle className="h-4 w-4" /> View Demo
               </Link>
               <Link
-                to="/dashboard"
-                className="inline-flex items-center gap-2 rounded-lg px-5 py-3 text-sm font-semibold text-muted-foreground hover:text-foreground"
+                to={"/sample-report" as any}
+                className="inline-flex items-center gap-2 rounded-lg border border-border bg-card/40 px-5 py-3 text-sm font-semibold text-foreground hover:bg-accent/30"
               >
-                View sample report
+                <Download className="h-4 w-4" /> Download Sample Report
+              </Link>
+            </div>
+            <div className="text-sm text-muted-foreground">
+              Already have an account?{" "}
+              <Link to={"/auth" as any} search={{ mode: "signin" } as any} className="font-semibold text-primary hover:underline">
+                Sign In
               </Link>
             </div>
             <div className="grid max-w-lg grid-cols-3 gap-4 pt-4">
@@ -217,33 +225,24 @@ function Index() {
             </p>
             <div className="flex justify-center gap-3 pt-2">
               <Link
-                to="/analyze"
+                to={"/auth" as any}
+                search={{ mode: "signup" } as any}
                 className="inline-flex items-center gap-2 rounded-lg bg-gradient-cyber px-5 py-3 text-sm font-semibold text-primary-foreground shadow-glow"
               >
-                Launch analyzer <ArrowRight className="h-4 w-4" />
+                Start Free Trial <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
-                to="/dashboard"
+                to={"/pricing" as any}
                 className="inline-flex items-center gap-2 rounded-lg border border-border bg-card/40 px-5 py-3 text-sm font-semibold hover:bg-accent/30"
               >
-                Open dashboard
+                See pricing
               </Link>
             </div>
           </div>
         </div>
       </section>
 
-      <footer className="border-t border-border/60 bg-card/30">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-6 py-8 text-xs text-muted-foreground sm:flex-row">
-          <div className="flex items-center gap-2">
-            <ShieldCheck className="h-4 w-4 text-[color:var(--success)]" />
-            ZeroVault · Analyze Documents. Never Store Them.
-          </div>
-          <div className="flex items-center gap-5">
-            <span>SOC2 · ISO 27001 · GDPR · HIPAA aligned</span>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }
