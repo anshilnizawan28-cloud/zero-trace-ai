@@ -1,3 +1,4 @@
+import type { PdfSignature } from "./signature";
 export interface DocMetadata {
   author?: string;
   creator?: string;
@@ -41,9 +42,63 @@ export interface ExtractResult {
   fileName: string;
   fileSize: number;
   mimeType: string;
+
   metadata: DocMetadata;
+
+  signatures: PdfSignature[];
+
   textExcerpt: string;
+
   fullTextLength: number;
+
   ocr: OcrResult;
+
   hashes: Hashes;
+}
+export interface SignatureAnalysis {
+  fieldName: string;
+
+  detected: boolean;
+
+  cryptographicStatus: "Valid" | "Invalid" | "Unknown";
+
+  signerName?: string;
+
+  organization?: string;
+
+  organizationalUnit?: string;
+
+  email?: string;
+
+  country?: string;
+
+  issuer?: string;
+
+  serialNumber?: string;
+
+  signatureAlgorithm?: string;
+
+  hashAlgorithm?: string;
+
+  signingTime?: string;
+
+  certificateValidFrom?: string;
+
+  certificateValidTo?: string;
+
+  certificateExpired?: boolean;
+
+  modifiedAfterSigning?: boolean;
+
+  timestampPresent?: boolean;
+
+  timestampAuthority?: string;
+
+  trustChainStatus?: "Trusted" | "Untrusted" | "Unknown";
+
+  revocationStatus?: "Good" | "Revoked" | "Unknown";
+
+  confidenceScore?: number;
+
+  notes?: string[];
 }
