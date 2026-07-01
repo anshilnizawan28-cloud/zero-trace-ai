@@ -158,20 +158,7 @@ export async function parsePdf(
       }
 
       if (a.subtype === "Widget" && a.fieldType === "Sig") {
-
-    console.log("=================================");
-    console.log("PDF SIGNATURE FOUND");
-    console.log("=================================");
-
-    console.dir(a, { depth: 10 });
-
-    console.log("Annotation Keys:");
-    console.log(Object.keys(a));
-
-    console.log("=================================");
-
-    annotations.push(a.fieldName ?? "signature");
-}
+        annotations.push(a.fieldName ?? "signature");
       }
 
       if (a.subtype === "Text" || a.subtype === "Popup") {
