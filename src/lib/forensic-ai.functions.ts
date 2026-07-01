@@ -6,6 +6,37 @@ const InputSchema = z.object({
   fileSize: z.number(),
   mimeType: z.string(),
   metadata: z.record(z.unknown()),
+ signatures: z.array(
+  z.object({
+    fieldName: z.string(),
+
+    detected: z.boolean(),
+
+    cryptographicStatus: z.string(),
+
+    confidenceScore: z.number(),
+
+    notes: z.array(z.string()),
+
+    issuer: z.string().optional(),
+
+    subject: z.string().optional(),
+
+    serialNumber: z.string().optional(),
+
+    validFrom: z.string().optional(),
+
+    validTo: z.string().optional(),
+
+    thumbprint: z.string().optional(),
+
+    signatureAlgorithm: z.string().optional(),
+
+    publicKeyAlgorithm: z.string().optional(),
+
+    trusted: z.boolean().optional(),
+  }),
+),
   textExcerpt: z.string().max(20_000),
   fullTextLength: z.number(),
   ocr: z.object({
@@ -52,13 +83,28 @@ You return STRICT JSON matching this TypeScript type:
   "topics": string[]                          // 3-6 high-level topics
 }
 
+If digital signatures are present, analyze them using the supplied signature metadata.
+
+Determine:
+- Signer (subject)
+- Organization
+- Issuer
+- Certificate validity period
+- Certificate expiry
+- Certificate trust status
+- Signature algorithm
+- Whether the cryptographic signature is valid or invalid
+- Whether the document appears modified after signing
+- Include signer and certificate findings in the executive summary whenever available.
+
+Prefer cryptographic evidence over assumptions.
+
 Rules:
 - Base every claim on the supplied data. Never fabricate dates, authors, or software not present.
 - If a Producer differs from Creator, note it (common but worth flagging when combined with other signals).
 - Treat the presence of track-changes, comments, multiple revisions, mismatched create/modify timestamps, or signs of OCR over a digitally-born document as raising risk.
 - A clean unsigned document with consistent metadata is Low risk. Use Critical only with concrete tampering indicators.
 - Output ONLY the JSON object. No markdown, no commentary.`;
-
 export const runForensicAnalysis = createServerFn({ method: "POST" })
   .validator((data: unknown) => InputSchema.parse(data))
   .handler(async ({ data }): Promise<ForensicReport> => {
@@ -71,6 +117,7 @@ export const runForensicAnalysis = createServerFn({ method: "POST" })
         mimeType: data.mimeType,
         hashes: data.hashes,
         metadata: data.metadata,
+signatures: data.signatures,
         ocr: { ...data.ocr, text: undefined, textPreview: data.ocr.text?.slice(0, 2000) },
         fullTextLength: data.fullTextLength,
         textExcerpt: data.textExcerpt,

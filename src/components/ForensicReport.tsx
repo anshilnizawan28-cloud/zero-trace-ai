@@ -71,6 +71,7 @@ export function ForensicReportView({
   const m = extract.metadata;
   const tone = report.riskLabel;
   const trust = computeTrustScore(extract, report);
+const signature = extract.signatures?.[0];
 
   return (
     <div className="space-y-6">
@@ -101,6 +102,67 @@ export function ForensicReportView({
 
       {/* Flagship Trust Score */}
       <TrustScoreCard score={trust} />
+<section className="rounded-2xl border border-border/60 bg-card p-6 shadow-card">
+  <div className="mb-5 flex items-center gap-2 text-sm font-semibold">
+    <ShieldCheck className="h-4 w-4 text-primary" />
+    Document Authenticity
+  </div>
+
+  {signature ? (
+    <div className="grid gap-2 text-sm">
+
+      <Field
+        label="Digital Signature"
+        value={
+          signature.cryptographicStatus === "Valid"
+            ? "? VALID"
+            : signature.cryptographicStatus === "Invalid"
+            ? "? INVALID"
+            : "UNKNOWN"
+        }
+      />
+
+      <Field label="Signed By" value={signature.subject} />
+
+      <Field label="Issuer" value={signature.issuer} />
+
+      <Field
+        label="Certificate Status"
+        value={signature.trusted ? "Trusted" : "Untrusted"}
+      />
+
+      <Field
+        label="Certificate Expiry"
+        value={signature.validTo}
+      />
+
+      <Field
+        label="Serial Number"
+        value={signature.serialNumber}
+      />
+
+      <Field
+        label="Signature Algorithm"
+        value={signature.signatureAlgorithm}
+      />
+
+      <Field
+        label="Trust Chain"
+        value={signature.trusted ? "Trusted" : "Unknown"}
+      />
+
+      <Field
+        label="Confidence"
+        value={`${signature.confidenceScore}/100`}
+      />
+
+    </div>
+  ) : (
+    <div className="text-sm text-muted-foreground">
+      No digital signature detected.
+    </div>
+  )}
+</section>
 
       {/* Executive */}
       <section className="rounded-2xl border border-border/60 bg-card p-6 shadow-card">
