@@ -1,4 +1,8 @@
 import type { PdfSignature } from "./signature";
+import type { SoftwareInfo } from "./intelligence/softwareDetector";
+import type { MetadataAnalysis } from "./intelligence/metadataAnalyzer";
+import type { TimelineEvent } from "./intelligence/timeline";
+
 export interface DocMetadata {
   author?: string;
   creator?: string;
@@ -21,7 +25,10 @@ export interface DocMetadata {
   hiddenComments?: string[];
   trackChanges?: string[];
   digitalSignatures?: string[];
-  encryption?: { encrypted: boolean; method?: string };
+  encryption?: {
+    encrypted: boolean;
+    method?: string;
+  };
   pdfVersion?: string;
   language?: string;
   raw?: Record<string, unknown>;
@@ -36,7 +43,11 @@ export interface OcrResult {
   pagesOcred?: number;
 }
 
-export interface Hashes { md5: string; sha256: string; sha512: string }
+export interface Hashes {
+  md5: string;
+  sha256: string;
+  sha512: string;
+}
 
 export interface ExtractResult {
   fileName: string;
@@ -54,13 +65,25 @@ export interface ExtractResult {
   ocr: OcrResult;
 
   hashes: Hashes;
+
+  // ===== Metadata Intelligence =====
+
+  software?: SoftwareInfo;
+
+  metadataAnalysis?: MetadataAnalysis;
+
+  timeline?: TimelineEvent[];
 }
+
 export interface SignatureAnalysis {
   fieldName: string;
 
   detected: boolean;
 
-  cryptographicStatus: "Valid" | "Invalid" | "Unknown";
+  cryptographicStatus:
+    | "Valid"
+    | "Invalid"
+    | "Unknown";
 
   signerName?: string;
 
@@ -94,9 +117,15 @@ export interface SignatureAnalysis {
 
   timestampAuthority?: string;
 
-  trustChainStatus?: "Trusted" | "Untrusted" | "Unknown";
+  trustChainStatus?:
+    | "Trusted"
+    | "Untrusted"
+    | "Unknown";
 
-  revocationStatus?: "Good" | "Revoked" | "Unknown";
+  revocationStatus?:
+    | "Good"
+    | "Revoked"
+    | "Unknown";
 
   confidenceScore?: number;
 

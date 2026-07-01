@@ -1,5 +1,10 @@
 import type { ExtractResult } from "./types";
 import { computeHashes } from "./hashes";
+import {
+  detectSoftware,
+  analyzeMetadata,
+  buildTimeline,
+} from "./intelligence";
 
 export type ProgressEvent =
   | { phase: "buffer"; pct: number }
@@ -72,6 +77,9 @@ export async function analyzeFile(
     performed: false,
     isScanned: false,
   };
+let software: ExtractResult["software"];
+let metadataAnalysis: ExtractResult["metadataAnalysis"];
+let timeline: ExtractResult["timeline"];
 
   try {
     if (kind === "pdf") {
@@ -173,6 +181,14 @@ export async function analyzeFile(
   }
 
   const excerpt = text.slice(0, 15000);
+software = detectSoftware(
+  metadata.creator,
+  metadata.producer,
+);
+
+metadataAnalysis = analyzeMetadata(metadata);
+
+timeline = buildTimeline(metadata);
 
   onProgress({
     phase: "wipe",
@@ -208,5 +224,10 @@ export async function analyzeFile(
     ocr,
 
     hashes,
+software,
+
+metadataAnalysis,
+
+timeline,
   };
 }
