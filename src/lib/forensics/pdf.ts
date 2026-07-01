@@ -36,6 +36,69 @@ export async function parsePdf(
 
   const doc = await loadingTask.promise;
 
+  // =====================================================
+  // DEBUG SECTION
+  // =====================================================
+
+  console.log("========================================");
+  console.log("PDF DEBUG INFORMATION");
+  console.log("========================================");
+
+  console.log("PDF Document");
+  console.dir(doc, { depth: 3 });
+
+  const transport = (doc as any)._transport;
+
+  console.log("Transport");
+  console.dir(transport, { depth: 5 });
+
+  if (transport) {
+    console.log("Transport Keys");
+    console.log(Object.keys(transport));
+
+    if (transport.commonObjs) {
+      console.log("commonObjs");
+      console.dir(transport.commonObjs, { depth: 2 });
+    }
+
+    if (transport.annotationStorage) {
+      console.log("annotationStorage");
+      console.dir(transport.annotationStorage, { depth: 4 });
+    }
+
+    if (transport.messageHandler) {
+      console.log("messageHandler");
+      console.dir(transport.messageHandler, { depth: 2 });
+    }
+
+    if (transport.pdfDocument) {
+      console.log("pdfDocument");
+      console.dir(transport.pdfDocument, { depth: 4 });
+    }
+
+    if (transport.pdfManager) {
+      console.log("pdfManager");
+      console.dir(transport.pdfManager, { depth: 4 });
+    }
+
+    if (transport.catalog) {
+      console.log("catalog");
+      console.dir(transport.catalog, { depth: 4 });
+    }
+
+    if (transport.xref) {
+      console.log("xref");
+      console.dir(transport.xref, { depth: 4 });
+    }
+  }
+
+  console.log("Document Keys");
+  console.log(Object.keys(doc));
+
+  console.log("========================================");
+
+  // =====================================================
+
   const meta = await doc
     .getMetadata()
     .catch(() => ({ info: {}, metadata: null } as any));
@@ -109,10 +172,10 @@ export async function parsePdf(
   }
 
   const sigs = annotations.filter(
-    (a) => !a.startsWith("comment:"),
+    (a) => !a.startsWith("comment:")
   );
 
-  const signatures = parsePdfSignatures(sigs);
+  const signatures = await parsePdfSignatures(sigs);
 
   const comments = annotations
     .filter((a) => a.startsWith("comment:"))
