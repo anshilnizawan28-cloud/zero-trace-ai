@@ -9,7 +9,7 @@ export async function parsePdfSignatures(
 
   for (const fieldName of fieldNames) {
 
-    const certificate = parseCertificate(undefined);
+    const certificate = null;
 
     signatures.push({
 
