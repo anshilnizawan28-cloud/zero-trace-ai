@@ -4,12 +4,9 @@ export interface ParsedCertificate {
   subject?: string;
   issuer?: string;
   serialNumber?: string;
-
   validFrom?: string;
   validTo?: string;
-
   signatureAlgorithm?: string;
-
   sha1Fingerprint?: string;
   sha256Fingerprint?: string;
 }
@@ -17,6 +14,7 @@ export interface ParsedCertificate {
 export function parseCertificate(
   certificateBytes?: Uint8Array,
 ): ParsedCertificate | null {
+
   if (!certificateBytes || certificateBytes.length === 0) {
     return null;
   }
@@ -36,38 +34,42 @@ export function parseCertificate(
       .map((a) => `${a.shortName}=${a.value}`)
       .join(", ");
 
-    const md1 = forge.md.sha1.create();
-    md1.update(
-      forge.asn1.toDer(asn1).getBytes(),
-    );
+    let sha1Fingerprint = "";
+    let sha256Fingerprint = "";
 
-    const md256 = forge.md.sha256.create();
-    md256.update(
-      forge.asn1.toDer(asn1).getBytes(),
-    );
+    try {
+      const derBytes = forge.asn1.toDer(asn1).getBytes();
+
+      if (forge.md?.sha1?.create) {
+        const md1 = forge.md.sha1.create();
+        md1.update(derBytes);
+        sha1Fingerprint = md1.digest().toHex();
+      }
+
+      if (forge.md?.sha256?.create) {
+        const md256 = forge.md.sha256.create();
+        md256.update(derBytes);
+        sha256Fingerprint = md256.digest().toHex();
+      }
+    } catch (err) {
+      console.warn("Fingerprint generation skipped", err);
+    }
 
     return {
       subject,
-
       issuer,
-
       serialNumber: cert.serialNumber,
-
       validFrom: cert.validity.notBefore.toISOString(),
-
       validTo: cert.validity.notAfter.toISOString(),
-
       signatureAlgorithm:
         cert.siginfo?.algorithmOid ??
         cert.signatureOid,
-
-      sha1Fingerprint: md1.digest().toHex(),
-
-      sha256Fingerprint: md256.digest().toHex(),
+      sha1Fingerprint,
+      sha256Fingerprint,
     };
+
   } catch (err) {
     console.error("Certificate parsing failed", err);
-
     return null;
   }
 }

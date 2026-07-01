@@ -157,8 +157,21 @@ export async function parsePdf(
         embedded.push(a.attachment?.filename ?? "embedded-file");
       }
 
-      if (a.subtype === "Widget" && a.fieldType === "Sig") {
-        annotations.push(a.fieldName ?? "signature");
+      if (a.subtype === "Widget" && a.fieldType === "Sig") {console.log("========== PDF SIGNATURE ==========");
+console.log("Field Name:", a.fieldName);
+
+console.dir(a, { depth: null });
+
+console.log("Keys:");
+console.log(Object.keys(a));
+
+console.log("Raw annotation:");
+console.log(JSON.stringify(a, null, 2));
+
+console.log("===================================");
+
+annotations.push(a.fieldName ?? "signature");
+      
       }
 
       if (a.subtype === "Text" || a.subtype === "Popup") {
