@@ -188,7 +188,10 @@ annotations.push(a.fieldName ?? "signature");
     (a) => !a.startsWith("comment:")
   );
 
-  const signatures = await parsePdfSignatures(sigs);
+  const signatures = await parsePdfSignatures(
+  sigs,
+  new Uint8Array(bytes),
+);
 
   const comments = annotations
     .filter((a) => a.startsWith("comment:"))
