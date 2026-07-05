@@ -6,9 +6,14 @@ export interface ParsedCertificate {
   email?: string;
   issuer?: string;
   serialNumber?: string;
+
   validFrom?: string;
   validTo?: string;
+
+  expired?: boolean;
+
   fingerprintSha256?: string;
+
   signatureAlgorithm?: string;
 }
 
@@ -16,7 +21,6 @@ function readAttribute(
   cert: Certificate,
   oid: string,
 ): string | undefined {
-
   const attr = cert.subject.typesAndValues.find(
     (x) => x.type === oid,
   );
@@ -29,15 +33,10 @@ function readAttribute(
 function readIssuer(
   cert: Certificate,
 ): string {
-
   return cert.issuer.typesAndValues
     .map((x) => {
-
-      const value =
-        x.value.valueBlock.value;
-
+      const value = x.value.valueBlock.value;
       return `${x.type}=${value}`;
-
     })
     .join(", ");
 }
@@ -45,9 +44,7 @@ function readIssuer(
 export function parseCertificate(
   cert: Certificate,
 ): ParsedCertificate {
-
   return {
-
     subject:
       readAttribute(cert, "2.5.4.3"),
 
@@ -72,12 +69,13 @@ export function parseCertificate(
     validTo:
       cert.notAfter.value.toISOString(),
 
+    expired:
+      cert.notAfter.value.getTime() < Date.now(),
+
     signatureAlgorithm:
       cert.signatureAlgorithm.algorithmId,
 
     fingerprintSha256:
       undefined,
-
   };
-
 }

@@ -106,7 +106,13 @@ Rules:
 - A clean unsigned document with consistent metadata is Low risk. Use Critical only with concrete tampering indicators.
 - Output ONLY the JSON object. No markdown, no commentary.`;
 export const runForensicAnalysis = createServerFn({ method: "POST" })
-  .validator((data: unknown) => InputSchema.parse(data))
+  .validator((data: unknown) => {
+  console.log("========== SERVER RECEIVED ==========");
+  console.dir(data, { depth: null });
+  console.log("=====================================");
+
+  return InputSchema.parse(data);
+})
   .handler(async ({ data }): Promise<ForensicReport> => {
     const { callLovableAiJson } = await import("./ai-gateway.server");
 

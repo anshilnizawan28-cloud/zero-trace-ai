@@ -115,7 +115,7 @@ const signature = extract.signatures?.[0];
         label="Digital Signature"
         value={
           signature.cryptographicStatus === "Valid"
-            ? "? VALID"
+            ? "VALID"
             : signature.cryptographicStatus === "Invalid"
             ? "? INVALID"
             : "UNKNOWN"
@@ -123,6 +123,20 @@ const signature = extract.signatures?.[0];
       />
 
       <Field label="Signed By" value={signature.subject} />
+<Field
+  label="Organization"
+  value={signature.organization}
+/>
+
+<Field
+  label="Email"
+  value={signature.email}
+/>
+
+<Field
+  label="Country"
+  value={signature.country}
+/>
 
       <Field label="Issuer" value={signature.issuer} />
 
@@ -132,9 +146,25 @@ const signature = extract.signatures?.[0];
       />
 
       <Field
-        label="Certificate Expiry"
-        value={signature.validTo}
-      />
+  label="Valid From"
+  value={signature.validFrom}
+/>
+
+<Field
+  label="Valid To"
+  value={signature.validTo}
+/>
+
+<Field
+  label="Certificate Expired"
+  value={
+    signature.validTo
+      ? new Date(signature.validTo) < new Date()
+        ? "Yes"
+        : "No"
+      : "Unknown"
+  }
+/>
 
       <Field
         label="Serial Number"
@@ -145,6 +175,10 @@ const signature = extract.signatures?.[0];
         label="Signature Algorithm"
         value={signature.signatureAlgorithm}
       />
+<Field
+  label="Public Key Algorithm"
+  value={signature.publicKeyAlgorithm}
+/>
 
       <Field
         label="Trust Chain"
@@ -240,7 +274,69 @@ const signature = extract.signatures?.[0];
             <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">
               <CheckCircle2 className="h-3.5 w-3.5 text-[color:var(--success)]" />
               Hashes generated locally and verified for chain-of-custody.
-            </div>
+            </div><section className="rounded-2xl border border-border/60 bg-card p-6 shadow-card">
+  <div className="mb-3 text-sm font-semibold">
+    PDF Security Analysis
+  </div>
+
+  <div className="space-y-2 text-xs">
+
+    <Field
+  label="Incremental Updates"
+  value={
+    (extract.metadata.raw as any)?.forensicScan?.hasIncrementalUpdates
+      ? "Detected"
+      : "Not detected"
+  }
+/>
+
+    <Field
+      label="JavaScript"
+      value={
+        (extract.metadata.raw as any)?.forensicScan?.hasJavaScript
+          ? "Present"
+          : "Not found"
+      }
+    />
+
+    <Field
+  label="Open Action"
+  value={
+    (extract.metadata.raw as any)?.forensicScan?.hasOpenAction
+      ? "Present"
+      : "Not found"
+  }
+/>
+
+    <Field
+  label="Embedded Files"
+  value={
+    (extract.metadata.raw as any)?.forensicScan?.hasEmbeddedFiles
+      ? "Present"
+      : "None"
+  }
+/>
+
+   <Field
+  label="AcroForm"
+  value={
+    (extract.metadata.raw as any)?.forensicScan?.hasAcroForm
+      ? "Present"
+      : "No"
+  }
+/>
+
+    <Field
+  label="Encryption"
+  value={
+    (extract.metadata.raw as any)?.forensicScan?.hasEncryption
+      ? "Encrypted"
+      : "None"
+  }
+/>
+
+  </div>
+</section>
           </section>
 
           <section className="rounded-2xl border border-border/60 bg-card p-6 shadow-card">

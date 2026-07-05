@@ -46,10 +46,34 @@ function WorkspaceHome() {
         .single();
       if (error) throw error;
       await supabase.from("memberships").insert({ org_id: data.id, user_id: user!.id, role: "owner" });
-      const { data: plan } = await supabase.from("plans").select("id").eq("tier", "free").maybeSingle();
-      if (plan) {
-        await supabase.from("subscriptions").insert({ org_id: data.id, plan_id: plan.id, status: "trialing" });
-      }
+      const { data: plan } = await supabase
+  .from("plans")
+  .select("id, monthly_credits, trial_days")
+  .eq("tier", "free")
+  .maybeSingle();
+
+if (plan) {
+
+  await supabase
+    .from("subscriptions")
+    .insert({
+      org_id: data.id,
+      plan_id: plan.id,
+      status: "trialing",
+      monthly_credit_balance: plan.monthly_credits,
+      trial_ends_at: new Date(
+        Date.now() + plan.trial_days * 24 * 60 * 60 * 1000
+      ).toISOString()
+    });
+
+  await supabase
+    .from("usage_tracking")
+    .insert({
+      org_id: data.id,
+      credits_used: 0,
+      credits_remaining: plan.monthly_credits
+    });
+}
       toast.success(`Workspace "${data.name}" created.`);
       setOrgs((prev) => [...(prev ?? []), { id: data.id, name: data.name }]);
       setOrgName("");

@@ -21,22 +21,17 @@ export function parseCms(
     );
 
     const asn1 = asn1js.fromBER(buffer);
+console.log("CMS ASN1 offset:", asn1.offset);
+console.log("CMS ASN1 result:", asn1.result);
 
     if (asn1.offset === -1) {
+  console.error(
+    "ASN1 parse failed. First 32 bytes:",
+    Buffer.from(cmsBytes.slice(0, 32)).toString("hex")
+  );
 
-      console.error("Invalid CMS ASN.1");
-
-      return null;
-
-    }
-
-    const contentInfo = new ContentInfo({
-      schema: asn1.result,
-    });
-
-    const signedData = new SignedData({
-      schema: contentInfo.content,
-    });
+  return null;
+}
 
     return {
 

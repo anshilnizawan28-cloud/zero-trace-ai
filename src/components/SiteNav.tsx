@@ -16,6 +16,10 @@ const NAV = [
 
 export function SiteNav() {
   const { user, signOut, loading } = useAuth();
+console.log("AUTH STATE:", {
+  loading,
+  user,
+});
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
 
@@ -46,20 +50,27 @@ export function SiteNav() {
           ))}
         </nav>
         <div className="flex items-center gap-2">
-          <Link
-            to="/auth"
-            search={{ mode: "signin" }}
-            className="hidden rounded-md border border-border px-3 py-1.5 text-sm text-foreground/90 hover:bg-accent/40 sm:inline-flex"
-          >
-            Sign in
-          </Link>
-          <Link
-            to="/auth"
-            search={{ mode: "signup" }}
-            className="hidden rounded-md bg-gradient-cyber px-3.5 py-1.5 text-sm font-medium text-primary-foreground shadow-glow sm:inline-flex"
-          >
-            Start free trial
-          </Link>
+          
+          {!loading && !user && (
+  <>
+    <Link
+      to="/auth"
+      search={{ mode: "signin" }}
+      className="hidden rounded-md border border-border px-3 py-1.5 text-sm text-foreground/90 hover:bg-accent/40 sm:inline-flex"
+    >
+      Sign in
+    </Link>
+
+    <Link
+      to="/auth"
+      search={{ mode: "signup" }}
+      className="hidden rounded-md bg-gradient-cyber px-3.5 py-1.5 text-sm font-medium text-primary-foreground shadow-glow sm:inline-flex"
+    >
+      Start free trial
+    </Link>
+  </>
+)}
+
           {!loading && user && (
             <>
               <div className="hidden items-center gap-2 rounded-md border border-border/60 bg-card/40 px-2.5 py-1.5 text-xs lg:flex">
@@ -105,8 +116,27 @@ export function SiteNav() {
                 {label}
               </Link>
             ))}
-            <Link to="/auth" search={{ mode: "signin" }} onClick={() => setOpen(false)} className="col-span-1 rounded-md border border-border px-3 py-2 text-center">Sign in</Link>
-            <Link to="/auth" search={{ mode: "signup" }} onClick={() => setOpen(false)} className="col-span-1 rounded-md bg-gradient-cyber px-3 py-2 text-center font-medium text-primary-foreground">Start free trial</Link>
+            {!loading && !user && (
+  <>
+    <Link
+      to="/auth"
+      search={{ mode: "signin" }}
+      onClick={() => setOpen(false)}
+      className="col-span-1 rounded-md border border-border px-3 py-2 text-center"
+    >
+      Sign in
+    </Link>
+
+    <Link
+      to="/auth"
+      search={{ mode: "signup" }}
+      onClick={() => setOpen(false)}
+      className="col-span-1 rounded-md bg-gradient-cyber px-3 py-2 text-center font-medium text-primary-foreground"
+    >
+      Start free trial
+    </Link>
+  </>
+)}
           </nav>
         </div>
       )}

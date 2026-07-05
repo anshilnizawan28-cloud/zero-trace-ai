@@ -14,7 +14,15 @@ function hexToBytes(hex: string): Uint8Array {
 
   return out;
 }
+function trimCmsPadding(bytes: Uint8Array): Uint8Array {
+  let end = bytes.length;
 
+  while (end > 0 && bytes[end - 1] === 0x00) {
+    end--;
+  }
+
+  return bytes.slice(0, end);
+}
 export function extractPdfSignature(
   pdfBytes: Uint8Array,
 ): ExtractedPdfSignature | null {
@@ -43,6 +51,8 @@ export function extractPdfSignature(
 
   return {
     byteRange,
-    contents: hexToBytes(contentsMatch[1]),
+    contents: trimCmsPadding(
+  hexToBytes(contentsMatch[1]),
+),
   };
 }

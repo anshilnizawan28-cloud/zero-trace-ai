@@ -2,10 +2,25 @@ import type { SignedData } from "pkijs";
 
 export interface ValidationResult {
   valid: boolean;
-  message: string;
-  modifiedAfterSigning: boolean;
-}
 
+  trusted: boolean;
+
+  message: string;
+
+  modifiedAfterSigning: boolean;
+
+  timestampPresent: boolean;
+
+  trustChainStatus:
+    | "Trusted"
+    | "Untrusted"
+    | "Unknown";
+
+  revocationStatus:
+    | "Good"
+    | "Revoked"
+    | "Unknown";
+}
 export async function validateSignature(
   signedData: SignedData,
 ): Promise<ValidationResult> {
@@ -19,16 +34,25 @@ export async function validateSignature(
 
     return {
 
-      valid: !!result,
+  valid: !!result,
 
-      message: result
-        ? "Cryptographic signature verified successfully."
-        : "Cryptographic verification failed.",
+  trusted: !!result,
 
-      modifiedAfterSigning: !result,
+  message: result
+    ? "Cryptographic signature verified successfully."
+    : "Cryptographic verification failed.",
 
-    };
+  modifiedAfterSigning: !result,
 
+  timestampPresent: false,
+
+  trustChainStatus: result
+    ? "Trusted"
+    : "Unknown",
+
+  revocationStatus: "Unknown",
+
+};
   } catch (err) {
 
     console.error(
@@ -36,18 +60,26 @@ export async function validateSignature(
       err,
     );
 
-    return {
+   return {
 
-      valid: false,
+  valid: false,
 
-      message:
-        err instanceof Error
-          ? err.message
-          : "Signature validation failed.",
+  trusted: false,
 
-      modifiedAfterSigning: true,
+  message:
+    err instanceof Error
+      ? err.message
+      : "Signature validation failed.",
 
-    };
+  modifiedAfterSigning: true,
+
+  timestampPresent: false,
+
+  trustChainStatus: "Unknown",
+
+  revocationStatus: "Unknown",
+
+};
 
   }
 

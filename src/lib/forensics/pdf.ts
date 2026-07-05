@@ -1,5 +1,6 @@
 import type { DocMetadata, OcrResult } from "./types";
 import { parsePdfSignatures } from "./signature";
+import { scanPdf } from "./pdfScanner";
 
 // pdfjs worker setup (Vite-friendly)
 import * as pdfjs from "pdfjs-dist";
@@ -30,6 +31,7 @@ export async function parsePdf(
   bytes: ArrayBuffer,
   onProgress?: (n: number, total: number, label: string) => void,
 ) {
+const scan = scanPdf(new Uint8Array(bytes));
   const loadingTask = pdfjs.getDocument({
     data: new Uint8Array(bytes).slice(),
   });
@@ -223,7 +225,11 @@ annotations.push(a.fieldName ?? "signature");
     },
     pdfVersion: (doc as any)._pdfInfo?.version,
     language: info.Language,
-    raw: info,
+    raw: {
+  ...info,
+
+  forensicScan: scan,
+},
   };
 
   const ocr: OcrResult = {

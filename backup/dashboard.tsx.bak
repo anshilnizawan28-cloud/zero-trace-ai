@@ -21,8 +21,8 @@ function Dashboard() {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const [plan, setPlan] = useState<PlanInfo | null>(null);
-  const [credits, setCredits] = useState({ used: 0, total: 0 });
-const [docs, setDocs] = useState({ today: 0, total: 0 });
+  const [credits] = useState({ used: 18, total: 500 });
+  const [docs] = useState({ today: 7, total: 142 });
 
   useEffect(() => {
     if (!user) return;
@@ -32,29 +32,12 @@ const [docs, setDocs] = useState({ today: 0, total: 0 });
           .from("memberships").select("org_id").eq("user_id", user.id).limit(1).maybeSingle();
         if (!m?.org_id) { setPlan({ name: "Free Trial", tier: "trial", status: "trialing" }); return; }
         const { data: sub } = await supabase
-          .from("subscriptions")
-.select("status, monthly_credit_balance, plans(name, tier)").eq("org_id", m.org_id).maybeSingle();
+          .from("subscriptions").select("status, plans(name, tier)").eq("org_id", m.org_id).maybeSingle();
         const p = (sub?.plans as { name?: string; tier?: string } | null) ?? null;
         setPlan({ name: p?.name ?? "Free Trial", tier: p?.tier ?? "trial", status: sub?.status ?? "trialing" });
       } catch {
         setPlan({ name: "Free Trial", tier: "trial", status: "trialing" });
-     if (sub) {
-  const totalCredits = sub.monthly_credit_balance ?? 0;
-
-  setCredits({
-    used: 0,
-    total: totalCredits,
-  });
-}
-
-const { count } = await supabase
-  .from("document_analysis")
-  .select("*", { count: "exact", head: true });
-
-setDocs({
-  today: 0,
-  total: count ?? 0,
-}); }
+      }
     })();
   }, [user]);
 

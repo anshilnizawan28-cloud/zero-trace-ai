@@ -111,7 +111,7 @@ export async function parsePdfSignatures(
       signatureAlgorithm:
         "RSA",
 
-      trusted: true,
+      trusted: verification.trusted,
 
     });
 
