@@ -16,13 +16,15 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 });
 
 type PlanInfo = { name: string; tier: string; status: string };
+type Recent = { id: string; file_name: string; trust_score: number | null; status: string; created_at: string };
 
 function Dashboard() {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const [plan, setPlan] = useState<PlanInfo | null>(null);
   const [credits, setCredits] = useState({ used: 0, total: 0 });
-const [docs, setDocs] = useState({ today: 0, total: 0 });
+  const [docs, setDocs] = useState({ today: 0, total: 0 });
+  const [recent, setRecent] = useState<Recent[]>([]);
 
   useEffect(() => {
     if (!user) return;
@@ -30,35 +32,52 @@ const [docs, setDocs] = useState({ today: 0, total: 0 });
       try {
         const { data: m } = await supabase
           .from("memberships").select("org_id").eq("user_id", user.id).limit(1).maybeSingle();
-        if (!m?.org_id) { setPlan({ name: "Free Trial", tier: "trial", status: "trialing" }); return; }
+        if (!m?.org_id) {
+          setPlan({ name: "Free Trial", tier: "trial", status: "trialing" });
+          return;
+        }
+        const orgId = m.org_id;
+
         const { data: sub } = await supabase
           .from("subscriptions")
-.select("status, monthly_credit_balance, plans(name, tier)").eq("org_id", m.org_id).maybeSingle();
+          .select("status, plans(name, tier)")
+          .eq("org_id", orgId)
+          .maybeSingle();
         const p = (sub?.plans as { name?: string; tier?: string } | null) ?? null;
-        setPlan({ name: p?.name ?? "Free Trial", tier: p?.tier ?? "trial", status: sub?.status ?? "trialing" });
+        setPlan({
+          name: p?.name ?? "Free Trial",
+          tier: p?.tier ?? "trial",
+          status: sub?.status ?? "trialing",
+        });
+
+        const { data: usage } = await supabase
+          .rpc("get_usage_snapshot", { _org: orgId })
+          .maybeSingle();
+        if (usage) {
+          setCredits({ used: usage.credits_used ?? 0, total: usage.monthly_limit ?? 0 });
+          setDocs((d) => ({ ...d, today: usage.documents_analyzed ?? 0 }));
+        }
+
+        const { count } = await supabase
+          .from("document_analysis")
+          .select("id", { count: "exact", head: true })
+          .eq("org_id", orgId);
+        setDocs((d) => ({ today: d.today, total: count ?? 0 }));
+
+        const { data: rows } = await supabase
+          .from("document_analysis")
+          .select("id, file_name, trust_score, status, created_at")
+          .eq("org_id", orgId)
+          .order("created_at", { ascending: false })
+          .limit(10);
+        setRecent((rows as Recent[]) ?? []);
       } catch {
         setPlan({ name: "Free Trial", tier: "trial", status: "trialing" });
-     if (sub) {
-  const totalCredits = sub.monthly_credit_balance ?? 0;
-
-  setCredits({
-    used: 0,
-    total: totalCredits,
-  });
-}
-
-const { count } = await supabase
-  .from("document_analysis")
-  .select("*", { count: "exact", head: true });
-
-setDocs({
-  today: 0,
-  total: count ?? 0,
-}); }
+      }
     })();
   }, [user]);
 
-  const remaining = credits.total - credits.used;
+  const remaining = Math.max(0, credits.total - credits.used);
   const firstName = (user?.user_metadata as { full_name?: string } | undefined)?.full_name?.split(" ")[0]
     || user?.email?.split("@")[0] || "there";
 
@@ -93,7 +112,7 @@ setDocs({
             sub={plan?.status === "trialing" ? "14-day free trial" : `Status: ${plan?.status ?? "—"}`}
             cta={{ to: "/pricing", label: "Upgrade" }} highlight />
           <SummaryCard icon={Coins} label="Remaining credits" value={remaining.toLocaleString()}
-            sub={`${credits.used} of ${credits.total} used this cycle`} meter={(credits.used / credits.total) * 100} />
+            sub={`${credits.used} of ${credits.total} used this cycle`} meter={credits.total ? (credits.used / credits.total) * 100 : 0} />
           <SummaryCard icon={FileText} label="Documents analyzed" value={docs.total.toLocaleString()} sub={`${docs.today} today`} />
           <SummaryCard icon={ShieldCheck} label="Zero Storage status" value="Active" sub="Memory-only · Auto-wipe enabled" tone="success" />
         </section>
@@ -117,28 +136,34 @@ setDocs({
               <span className="text-xs text-muted-foreground">Session only · auto-clears on sign out</span>
             </div>
             <div className="mt-4 divide-y divide-border/60">
-              {[
-                ["Q3-loan-agreement.pdf", "Trust 82 · Trusted", "Verified", "2m ago"],
-                ["claim-#A8231.docx", "Trust 71 · Trusted", "Verified", "14m ago"],
-                ["patient-discharge.pdf", "Trust 38 · Caution", "Caution", "32m ago"],
-                ["vendor-contract.docx", "Trust 91 · Verified", "Verified", "1h ago"],
-              ].map(([name, trust, band, time]) => (
-                <div key={name} className="flex items-center justify-between gap-4 py-3">
-                  <div className="flex items-center gap-3">
-                    <div className="grid h-9 w-9 place-items-center rounded-lg bg-muted"><FileText className="h-4 w-4 text-muted-foreground" /></div>
-                    <div>
-                      <div className="text-sm font-medium">{name}</div>
-                      <div className="text-xs text-muted-foreground">{trust} · {time}</div>
-                    </div>
-                  </div>
-                  <span className={[
-                    "rounded-full border px-2.5 py-0.5 text-[11px] font-semibold",
-                    band === "Verified" ? "border-[color:var(--success)]/40 bg-[color:var(--success)]/10 text-[color:var(--success)]"
-                    : band === "Trusted" ? "border-primary/40 bg-primary/10 text-primary"
-                    : "border-[color:var(--warning)]/40 bg-[color:var(--warning)]/10 text-[color:var(--warning)]",
-                  ].join(" ")}>{band}</span>
+              {recent.length === 0 && (
+                <div className="py-6 text-center text-xs text-muted-foreground">
+                  No analyses yet. Run your first document to see it here.
                 </div>
-              ))}
+              )}
+              {recent.map((r) => {
+                const ts = r.trust_score ?? 0;
+                const band = ts >= 85 ? "Verified" : ts >= 65 ? "Trusted" : ts >= 40 ? "Caution" : "Untrusted";
+                const when = new Date(r.created_at).toLocaleString();
+                return (
+                  <div key={r.id} className="flex items-center justify-between gap-4 py-3">
+                    <div className="flex items-center gap-3">
+                      <div className="grid h-9 w-9 place-items-center rounded-lg bg-muted"><FileText className="h-4 w-4 text-muted-foreground" /></div>
+                      <div>
+                        <div className="text-sm font-medium">{r.file_name}</div>
+                        <div className="text-xs text-muted-foreground">Trust {ts} · {r.status} · {when}</div>
+                      </div>
+                    </div>
+                    <span className={[
+                      "rounded-full border px-2.5 py-0.5 text-[11px] font-semibold",
+                      band === "Verified" ? "border-[color:var(--success)]/40 bg-[color:var(--success)]/10 text-[color:var(--success)]"
+                      : band === "Trusted" ? "border-primary/40 bg-primary/10 text-primary"
+                      : band === "Caution" ? "border-[color:var(--warning)]/40 bg-[color:var(--warning)]/10 text-[color:var(--warning)]"
+                      : "border-destructive/40 bg-destructive/10 text-destructive",
+                    ].join(" ")}>{band}</span>
+                  </div>
+                );
+              })}
             </div>
           </div>
           <div className="space-y-4">
