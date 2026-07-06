@@ -136,7 +136,7 @@ function Analyze() {
             processing_time_ms: Date.now() - startedAt,
             findings,
           };
-          const { error: rpcErr } = await supabase.rpc("persist_analysis", { p_payload: payload });
+          const { error: rpcErr } = await supabase.rpc("persist_analysis", { p_payload: payload as never });
           if (rpcErr) {
             if (/NO_CREDITS/.test(rpcErr.message)) {
               toast.error("No credits remaining. Upgrade your subscription.");
