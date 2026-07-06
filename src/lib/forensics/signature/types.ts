@@ -29,4 +29,12 @@ export interface PdfSignature {
   publicKeyAlgorithm?: string;
 
   trusted?: boolean;
+
+  organization?: string;
+
+  organizationalUnit?: string;
+
+  email?: string;
+
+  country?: string;
 }

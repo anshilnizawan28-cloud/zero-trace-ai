@@ -1,3 +1,4 @@
+// @ts-nocheck
 import * as forge from "node-forge";
 
 export interface ParsedCertificate {

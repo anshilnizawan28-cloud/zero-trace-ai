@@ -11,6 +11,10 @@ import { analyzeFile, type ProgressEvent } from "@/lib/forensics/analyze";
 import type { ExtractResult } from "@/lib/forensics/types";
 import { runForensicAnalysis, type ForensicReport } from "@/lib/forensic-ai.functions";
 import { ForensicReportView } from "@/components/ForensicReport";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/lib/auth-context";
+import { computeTrustScore } from "@/components/TrustScore";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/analyze")({
   head: () => ({
@@ -35,6 +39,7 @@ function Analyze() {
   const [running, setRunning] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const callAi = useServerFn(runForensicAnalysis);
+  const { user } = useAuth();
 
   const onDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -50,7 +55,23 @@ function Analyze() {
     setError(null);
     setRunning(true);
     setProgress({ pct: 5, label: "Buffering file in encrypted memory" });
+    const startedAt = Date.now();
     try {
+      // Pre-flight: resolve org + credit check
+      let orgId: string | null = null;
+      if (user) {
+        const { data: m } = await supabase
+          .from("memberships").select("org_id").eq("user_id", user.id).limit(1).maybeSingle();
+        orgId = m?.org_id ?? null;
+        if (orgId) {
+          const { data: usage } = await supabase
+            .rpc("get_usage_snapshot", { _org: orgId }).maybeSingle();
+          if (usage && (usage.credits_remaining ?? 0) <= 0) {
+            throw new Error("No credits remaining. Upgrade your subscription.");
+          }
+        }
+      }
+
       const labelMap: Record<ProgressEvent["phase"], string> = {
         buffer: "Buffering file in encrypted memory",
         hash: "Generating SHA-256, SHA-512, MD5",
@@ -78,6 +99,57 @@ function Analyze() {
   },
 });
       setReport(r);
+
+      // Persist analysis + findings + report + usage in one transaction
+      if (orgId) {
+        try {
+          const trust = computeTrustScore(ex, r);
+          const findings = [
+            ...(r.suspiciousIndicators ?? []).map((t) => ({
+              category: "tampering", severity: "high", title: t, description: t,
+            })),
+            ...(r.editingSoftwareDetected ?? []).map((t) => ({
+              category: "editing-software", severity: "info", title: t, description: t,
+            })),
+            ...(r.recommendations ?? []).map((t) => ({
+              category: "recommendation", severity: "info", title: t, description: t,
+            })),
+          ];
+          const payload = {
+            org_id: orgId,
+            file_name: ex.fileName,
+            file_size: ex.fileSize,
+            mime_type: ex.mimeType,
+            sha256_hash: ex.hashes.sha256,
+            md5_hash: ex.hashes.md5,
+            trust_score: trust.overall,
+            risk_score: r.riskScore,
+            risk_label: r.riskLabel,
+            tampering_confidence: r.tamperingConfidence,
+            ai_summary: r.executiveSummary,
+            forensic_report: r,
+            metadata: ex.metadata,
+            signature_verified: trust.signatureStatus === "Valid",
+            ocr_used: !!ex.ocr?.performed,
+            watermark_detected: false,
+            tampering_detected: (r.suspiciousIndicators?.length ?? 0) > 0,
+            processing_time_ms: Date.now() - startedAt,
+            findings,
+          };
+          const { error: rpcErr } = await supabase.rpc("persist_analysis", { p_payload: payload as never });
+          if (rpcErr) {
+            if (/NO_CREDITS/.test(rpcErr.message)) {
+              toast.error("No credits remaining. Upgrade your subscription.");
+            } else {
+              toast.error(`Report not saved: ${rpcErr.message}`);
+            }
+          } else {
+            toast.success("Report saved to your workspace.");
+          }
+        } catch (persistErr) {
+          toast.error(`Report not saved: ${(persistErr as Error).message}`);
+        }
+      }
     } catch (err) {
       setError((err as Error).message || "Analysis failed");
     } finally {

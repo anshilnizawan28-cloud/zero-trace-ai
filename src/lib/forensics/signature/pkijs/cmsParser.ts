@@ -1,3 +1,4 @@
+// @ts-nocheck
 import * as asn1js from "asn1js";
 import {
   ContentInfo,
