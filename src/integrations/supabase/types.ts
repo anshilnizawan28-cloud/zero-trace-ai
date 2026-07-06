@@ -14,6 +14,54 @@ export type Database = {
   }
   public: {
     Tables: {
+      analysis_findings: {
+        Row: {
+          category: string | null
+          created_at: string
+          description: string | null
+          document_id: string
+          id: string
+          org_id: string
+          severity: string | null
+          title: string | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          document_id: string
+          id?: string
+          org_id: string
+          severity?: string | null
+          title?: string | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          document_id?: string
+          id?: string
+          org_id?: string
+          severity?: string | null
+          title?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "analysis_findings_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "document_analysis"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "analysis_findings_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       api_keys: {
         Row: {
           created_at: string
@@ -258,6 +306,86 @@ export type Database = {
             columns: ["report_id"]
             isOneToOne: false
             referencedRelation: "reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      document_analysis: {
+        Row: {
+          ai_summary: string | null
+          created_at: string
+          credits_consumed: number
+          file_name: string
+          file_size: number
+          forensic_report: Json | null
+          id: string
+          md5_hash: string | null
+          metadata: Json | null
+          mime_type: string | null
+          ocr_used: boolean
+          org_id: string
+          processing_time_ms: number | null
+          risk_score: number | null
+          sha256_hash: string | null
+          signature_verified: boolean
+          status: string
+          tampering_detected: boolean
+          trust_score: number | null
+          user_id: string
+          watermark_detected: boolean
+        }
+        Insert: {
+          ai_summary?: string | null
+          created_at?: string
+          credits_consumed?: number
+          file_name: string
+          file_size: number
+          forensic_report?: Json | null
+          id?: string
+          md5_hash?: string | null
+          metadata?: Json | null
+          mime_type?: string | null
+          ocr_used?: boolean
+          org_id: string
+          processing_time_ms?: number | null
+          risk_score?: number | null
+          sha256_hash?: string | null
+          signature_verified?: boolean
+          status?: string
+          tampering_detected?: boolean
+          trust_score?: number | null
+          user_id: string
+          watermark_detected?: boolean
+        }
+        Update: {
+          ai_summary?: string | null
+          created_at?: string
+          credits_consumed?: number
+          file_name?: string
+          file_size?: number
+          forensic_report?: Json | null
+          id?: string
+          md5_hash?: string | null
+          metadata?: Json | null
+          mime_type?: string | null
+          ocr_used?: boolean
+          org_id?: string
+          processing_time_ms?: number | null
+          risk_score?: number | null
+          sha256_hash?: string | null
+          signature_verified?: boolean
+          status?: string
+          tampering_detected?: boolean
+          trust_score?: number | null
+          user_id?: string
+          watermark_detected?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_analysis_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
             referencedColumns: ["id"]
           },
         ]
@@ -766,6 +894,50 @@ export type Database = {
           },
         ]
       }
+      usage_tracking: {
+        Row: {
+          created_at: string
+          credits_remaining: number
+          credits_used: number
+          documents_analyzed: number
+          id: string
+          monthly_limit: number
+          org_id: string
+          period_start: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          credits_remaining?: number
+          credits_used?: number
+          documents_analyzed?: number
+          id?: string
+          monthly_limit?: number
+          org_id: string
+          period_start: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          credits_remaining?: number
+          credits_used?: number
+          documents_analyzed?: number
+          id?: string
+          monthly_limit?: number
+          org_id?: string
+          period_start?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "usage_tracking_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_sessions: {
         Row: {
           created_at: string
@@ -801,6 +973,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_usage_snapshot: {
+        Args: { _org: string }
+        Returns: {
+          credits_remaining: number
+          credits_used: number
+          documents_analyzed: number
+          monthly_limit: number
+        }[]
+      }
       has_any_org_role: {
         Args: {
           _org: string
@@ -818,6 +999,7 @@ export type Database = {
         Returns: boolean
       }
       is_org_member: { Args: { _org: string; _user: string }; Returns: boolean }
+      persist_analysis: { Args: { p_payload: Json }; Returns: string }
     }
     Enums: {
       app_role: "owner" | "admin" | "auditor" | "analyst" | "viewer"
